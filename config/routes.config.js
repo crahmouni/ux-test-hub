@@ -15,11 +15,9 @@ router.delete("/prototypes/:id", auth.isAuthenticated, auth.isAdmin, prototypes.
 router.patch("/prototypes/:id", auth.isAuthenticated, auth.isAdmin, prototypes.update);
 
 router.post("/prototypes/:id/comments", auth.isAuthenticated, prototypes.createComment);
-router.get(
-  "/prototypes/:id/comments/:commentId",
-  auth.isAuthenticated,
-  prototypes.detailComment
-);
+router.get("/prototypes/:id/comments/:commentId",auth.isAuthenticated, prototypes.detailComment);
+router.delete("/prototypes/:id/comments/:commentId", auth.isAuthenticated, prototypes.deleteComment);
+
 
 router.post("/users", storage.single("avatar"), users.create);
 router.patch("/users/me", auth.isAuthenticated, users.update);

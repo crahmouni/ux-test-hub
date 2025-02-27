@@ -13,6 +13,7 @@ const schema = new mongoose.Schema(
     prototype: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Prototype", // reference to the Prototype model
+      required: true,
     },
   },
   {

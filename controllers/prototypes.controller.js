@@ -52,20 +52,39 @@ module.exports.list = (req, res, next) => {
 };
 
 module.exports.create = (req, res, next) => {
-  const prototype = req.body;
+  try {
+    //  Aseguramos que req.body contiene la información correcta
+    const prototypeData = req.body;
 
-  if (prototype.address?.location) {
-    const { lat, lng } = prototype.address.location || {};
-    prototype.address.location = {
-      type: 'Point',
-      coordinates: [lng, lat]
+    if (!prototypeData.title || !prototypeData.startDate || !prototypeData.endDate) {
+      return res.status(400).json({ message: "Missing required fields" });
     }
-  }
 
-  Prototype.create(prototype)
-    .then((prototype) => res.status(201).json(prototype))
-    .catch((error) => next(error));
+    if (prototypeData.address?.location) {
+      const { lat, lng } = prototypeData.address.location || {};
+      if (!lat || !lng) {
+        return res.status(400).json({ message: "Coordinates must be valid numbers" });
+      }
+      prototypeData.address.location = {
+        type: "Point",
+        coordinates: [lng, lat],
+      };
+    }
+
+    //  Crear el prototipo en la base de datos
+    Prototype.create(prototypeData)
+      .then((createdPrototype) => res.status(201).json(createdPrototype))
+      .catch((error) => {
+        console.error(error);
+        next(error);
+      });
+
+  } catch (error) {
+    console.error("Error en create prototype:", error);
+    next(error);
+  }
 };
+
 
 module.exports.detail = (req, res, next) => {
   const { id } = req.params;
@@ -84,7 +103,7 @@ module.exports.delete = (req, res, next) => {
   Prototype.findByIdAndDelete(id)
     .then((prototype) => {
       if (!prototype) next(createError(404, "Prototype not found"));
-      else res.status(204).send();
+      else res.status(204).json({ message: "Prototype deleted successfully" });
     })
     .catch((error) => next(error));
 };
@@ -123,4 +142,17 @@ module.exports.detailComment = (req, res, next) => {
     .populate("prototype") // populate prototype. thanks to model reference to Prototype
     .then((comment) => res.json(comment))
     .catch(next);
+};
+
+module.exports.deleteComment = (req, res, next) => {
+  const { commentId } = req.params;
+
+  Comment.findByIdAndDelete(commentId)
+    .then((comment) => {
+      if (!comment) {
+        return next(createError(404, "Comment not found"));
+      }
+      res.status(204).send(); // No content
+    })
+    .catch((error) => next(error));
 };
