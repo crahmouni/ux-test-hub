@@ -1,6 +1,6 @@
 const createError = require("http-errors");
 const User = require("../models/user.model");
-const { sendValidationEmail } = require("../config/mailer.config");
+const { sendValidationEmail, sendWelcomeEmail } = require("../config/mailer.config");
 
 module.exports.create = (req, res, next) => {
   const { email } = req.body;
@@ -21,7 +21,15 @@ module.exports.create = (req, res, next) => {
           name: req.body.name,
           avatar: req.file?.path,
         }).then((user) => {
-          sendValidationEmail(user);
+          // Enviar email de validación
+          sendValidationEmail(user)
+            .then(() => console.log(`Email de validación enviado a ${user.email}`))
+            .catch((error) => console.error("Error enviando email de validación:", error));
+
+          // Enviar email de bienvenida
+          sendWelcomeEmail(user.email, user.name)
+            .then(() => console.log(`Email de bienvenida enviado a ${user.email}`))
+            .catch((error) => console.error("Error enviando email de bienvenida:", error));
 
           res.status(201).json(user);
         });
