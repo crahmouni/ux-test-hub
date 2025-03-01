@@ -7,6 +7,7 @@ const users = require("../controllers/users.controller");
 const sessions = require("../controllers/sessions.controller");
 const auth = require("../middlewares/session.middleware");
 const storage = require("../config/storage.config");
+const stats = require("../controllers/stats.controller");
 
 router.get("/prototypes", auth.isAuthenticated, prototypes.list);
 router.post("/prototypes", auth.isAuthenticated, auth.isAdmin, prototypes.create);
@@ -26,6 +27,10 @@ router.get("/users/:id/validate", users.validate);
 
 router.post("/sessions", sessions.create);
 router.delete("/sessions", auth.isAuthenticated, sessions.destroy);
+
+router.get("/stats/prototypes", stats.getTopPrototypes);
+router.get("/stats/users", stats.getTopUsers);
+router.get("/stats/general", stats.getGeneralStats);
 
 router.use((req, res, next) => {
   next(createError(404, "Route not found"));
