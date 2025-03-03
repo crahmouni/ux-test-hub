@@ -3,13 +3,17 @@ const User = require("../models/user.model");
 
 module.exports.loadSessionUser = (req, res, next) => {
   const { userId } = req.session;
+  console.log("userId en sesión:", userId);
+
   if (!userId) {
     req.user = undefined;
+    console.log("No hay userId en la sesión");
     next();
   } else {
     User.findById(userId)
       .then((user) => {
         req.user = user;
+        console.log("Usuario autenticado:", user);
         next();
       })
       .catch((error) => next(error));

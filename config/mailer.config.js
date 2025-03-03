@@ -39,3 +39,36 @@ module.exports.sendWelcomeEmail = (userEmail, userName) => {
     `,
   });
 };
+
+module.exports.sendPrototypeConfirmationEmail = (userEmail, prototype) => {
+  return transporter.sendMail({
+    from: `"UX Test Hub" <${process.env.EMAIL_USER}>`,
+    to: userEmail,
+    subject: "Tu prototipo ha sido publicado 🎉",
+    text: `¡Hola! Tu prototipo "${prototype.title}" ha sido publicado en UX Test Hub.`,
+    html: `<p>¡Hola! Tu prototipo <strong>${prototype.title}</strong> ha sido publicado en UX Test Hub.</p>`,
+  });
+};
+
+module.exports.sendPrototypeDeletedEmail = (userEmail, prototype) => {
+  return transporter.sendMail({
+    from: `"UX Test Hub" <${process.env.EMAIL_USER}>`,
+    to: userEmail,
+    subject: "Tu prototipo ha sido eliminado ❌",
+    text: `Hola, tu prototipo "${prototype.title}" ha sido eliminado de UX Test Hub.`,
+    html: `<p>Hola, tu prototipo <strong>${prototype.title}</strong> ha sido eliminado de UX Test Hub.</p>`,
+  });
+};
+
+module.exports.sendNewCommentEmail = (userEmail, prototype, comment) => {
+  return transporter.sendMail({
+    from: `"UX Test Hub" <${process.env.EMAIL_USER}>`,
+    to: userEmail,
+    subject: "Nuevo comentario en tu prototipo 💬",
+    text: `Tu prototipo "${prototype.title}" ha recibido un nuevo comentario: "${comment.text}".`,
+    html: `<p>Tu prototipo <strong>${prototype.title}</strong> ha recibido un nuevo comentario:</p>
+           <blockquote>${comment.text}</blockquote>`,
+  });
+};
+
+

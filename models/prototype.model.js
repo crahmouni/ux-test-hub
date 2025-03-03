@@ -79,6 +79,11 @@ const prototypeSchema = new mongoose.Schema(
           return "Invalid poster URL";
         }
       }
+    },
+   user: {
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: "User",
+      required: true,
     }
   },
   {

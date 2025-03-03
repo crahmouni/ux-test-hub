@@ -1,6 +1,7 @@
 const createError = require("http-errors");
 const Prototype = require("../models/prototype.model");
 const Comment = require("../models/comment.model");
+const mailer = require("../config/mailer.config");
 
 module.exports.list = (req, res, next) => {
   const { limit = 5, 
@@ -53,7 +54,6 @@ module.exports.list = (req, res, next) => {
 
 module.exports.create = (req, res, next) => {
   try {
-    //  Aseguramos que req.body contiene la información correcta
     const prototypeData = req.body;
 
     if (!prototypeData.title || !prototypeData.startDate || !prototypeData.endDate) {
@@ -71,9 +71,14 @@ module.exports.create = (req, res, next) => {
       };
     }
 
-    //  Crear el prototipo en la base de datos
-    Prototype.create(prototypeData)
-      .then((createdPrototype) => res.status(201).json(createdPrototype))
+    Prototype.create({ ...prototypeData, user: req.user.id })
+      .then((createdPrototype) => {
+        if (req.user && req.user.email) {
+          mailer.sendPrototypeConfirmationEmail(req.user.email, createdPrototype)
+            .catch(error => console.error("Error enviando email:", error));
+        }
+        res.status(201).json(createdPrototype);
+      })
       .catch((error) => {
         console.error(error);
         next(error);
@@ -102,8 +107,12 @@ module.exports.delete = (req, res, next) => {
   const { id } = req.params;
   Prototype.findByIdAndDelete(id)
     .then((prototype) => {
-      if (!prototype) next(createError(404, "Prototype not found"));
-      else res.status(204).json({ message: "Prototype deleted successfully" });
+      if (!prototype) {
+        return next(createError(404, "Prototype not found"));
+      }
+
+      mailer.sendPrototypeDeletedEmail(req.user.email, prototype);
+      res.status(204).json({ message: "Prototype deleted successfully" });
     })
     .catch((error) => next(error));
 };
@@ -127,12 +136,26 @@ module.exports.update = (req, res, next) => {
 };
 
 module.exports.createComment = (req, res, next) => {
-  Comment.create({
-    text: req.body.text,
-    user: req.user.id,
-    prototype: req.params.id,
-  })
-    .then((comment) => res.status(201).json(comment))
+  Prototype.findById(req.params.id)
+    .populate("user")
+    .then((prototype) => {
+      if (!prototype) {
+        return next(createError(404, "Prototype not found"));
+      }
+
+      return Comment.create({
+        text: req.body.text,
+        user: req.user.id,
+        prototype: req.params.id,
+      })
+      .then((comment) => {
+        if (prototype.user && prototype.user.email) {
+          mailer.sendNewCommentEmail(prototype.user.email, prototype, comment)
+            .catch(error => console.error("Error enviando email:", error));
+        }
+        res.status(201).json(comment);
+      });
+    })
     .catch(next);
 };
 
