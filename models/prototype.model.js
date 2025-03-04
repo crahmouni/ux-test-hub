@@ -24,7 +24,7 @@ const prototypeSchema = new mongoose.Schema(
       required: [true, "Starting date is required"],
       validate: {
         validator: function (startDate) {
-          return dayjs(startDate).isAfter(dayjs());
+          return dayjs(startDate).isAfter(dayjs(), "day");
         },
         message: function () {
           return "Starting date can not be in the past";
@@ -81,11 +81,22 @@ const prototypeSchema = new mongoose.Schema(
       }
     },
    user: {
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: "User",
-      required: true,
-    }
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: "User",
+    required: true,
   },
+  status: {
+    type: String,
+    enum: ["pending", "approved", "rejected"],
+    default: "pending",
+  },
+  feedback: {
+    type: String,
+    trim: true,
+    default: "",
+  }
+  },
+  
   {
     timestamps: true,
     toJSON: {

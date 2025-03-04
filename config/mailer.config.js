@@ -71,4 +71,34 @@ module.exports.sendNewCommentEmail = (userEmail, prototype, comment) => {
   });
 };
 
+module.exports.sendReviewNotificationEmail = (userEmail, prototype) => {
+  return transporter.sendMail({
+    from: `"UX Test Hub" <${process.env.EMAIL_USER}>`,
+    to: userEmail,
+    subject: `Tu prototipo ha sido ${prototype.status} 🚀`,
+    html: `
+      <h1>¡Hola!</h1>
+      <p>Tu prototipo <strong>${prototype.title}</strong> ha sido <strong>${prototype.status}</strong>.</p>
+      <p><strong>Feedback:</strong> ${prototype.feedback || "Sin comentarios"}</p>
+      <p>Gracias por contribuir a UX Test Hub.</p>
+    `,
+  });
+};
+
+module.exports.sendPrototypeStatusEmail = (userEmail, prototype) => {
+  return transporter.sendMail({
+    from: `"UX Test Hub" <${process.env.EMAIL_USER}>`,
+    to: userEmail,
+    subject: `Estado de tu prototipo: ${prototype.status}`,
+    html: `
+      <h1>Hola,</h1>
+      <p>El estado de tu prototipo <strong>${prototype.title}</strong> ha cambiado a: <strong>${prototype.status}</strong>.</p>
+      <p>Feedback del administrador: ${prototype.feedback}</p>
+      <p>Si tienes dudas, contáctanos.</p>
+      <p>El equipo de UX Test Hub </p>
+    `,
+  });
+};
+
+
 

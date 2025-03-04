@@ -12,8 +12,13 @@ module.exports.loadSessionUser = (req, res, next) => {
   } else {
     User.findById(userId)
       .then((user) => {
-        req.user = user;
-        console.log("Usuario autenticado:", user);
+        if (!user) {
+          console.log("Usuario no encontrado");
+          req.user = undefined;
+        } else {
+          req.user = user;
+          console.log("Usuario autenticado:", user);
+        }
         next();
       })
       .catch((error) => next(error));

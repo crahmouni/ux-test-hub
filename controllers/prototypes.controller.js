@@ -2,13 +2,18 @@ const createError = require("http-errors");
 const Prototype = require("../models/prototype.model");
 const Comment = require("../models/comment.model");
 const mailer = require("../config/mailer.config");
+const mongoose = require("mongoose");
 
 module.exports.list = (req, res, next) => {
-  const { limit = 5, 
+  const { 
+    limit = 5, 
     page = 0, 
     sort = 'startDate', 
     city, 
-    title,
+    title, 
+    userId, 
+    startDate, 
+    endDate,
     radius = 5000,
     lat,
     lng
@@ -22,8 +27,23 @@ module.exports.list = (req, res, next) => {
   }
 
   const criterial = {};
+  if (title) criterial.title = new RegExp(title, 'i'); // Búsqueda parcial por título
+  
+  if (userId) {
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return next(createError(400, { message: "Invalid userId format" }));
+    }
+    criterial.user = new mongoose.Types.ObjectId(userId); // Convertimos el userId a ObjectId
+  }
+
+  if (startDate || endDate) {
+    criterial.startDate = {};
+    if (startDate) criterial.startDate.$gte = new Date(startDate); // Fecha mínima
+    if (endDate) criterial.startDate.$lte = new Date(endDate); // Fecha máxima
+  }
+ 
   if (city) criterial['address.city'] = city;
-  if (title) criterial.title = new RegExp(title, 'i');
+ 
   if (lat && lng) {
     if (Number.isNaN(Number(lat)) || !(Number(lat) >= -90 && Number(lat) <= 90)) {
       return next(createError(400, { message: 'Invalid lat parameter', errors: { lat: 'Must be -90 >= lat <= 90' } }));
@@ -43,10 +63,14 @@ module.exports.list = (req, res, next) => {
     }
   }
 
+  // Ordenación por cantidad de comentarios o por fecha
+  const sortCriterial = sort === "comments" ? { comments: -1 } : { [sort]: 'desc' };
+
   Prototype.find(criterial)
-    .sort({ [sort]: 'desc' })
+    .sort(sortCriterial)
     .limit(limit)
     .skip(limit * page)
+    .populate("user")
     .populate("comments") // populate comments. thanks to Prototype virtual "comment" field
     .then((prototypes) => res.json(prototypes))
     .catch((error) => next(error));
@@ -90,6 +114,63 @@ module.exports.create = (req, res, next) => {
   }
 };
 
+module.exports.reviewPrototype = (req, res, next) => {
+  const { id } = req.params;
+  console.log("ID recibido:", id);
+  const { status, feedback } = req.body;
+
+  if (!["approved", "rejected"].includes(status)) {
+    return next(createError(400, "Invalid status, must be 'approved' or 'rejected'"));
+  }
+
+  Prototype.findById(id)
+  .populate("user") // Poblar el usuario para asegurar que existe antes de acceder a su email
+  .then((prototype) => {
+    if (!prototype) {  
+      console.log("❌ Prototipo no encontrado en la base de datos");
+      return next(createError(404, "Prototype not found"));
+    }
+    
+    prototype.status = status;
+    prototype.feedback = feedback;
+
+    return prototype.save().then((updatedPrototype) => {
+      if (updatedPrototype.user && updatedPrototype.user.email) {
+        mailer.sendPrototypeStatusEmail(updatedPrototype.user.email, updatedPrototype)
+          .catch(error => console.error("Error enviando email:", error));
+      } else {
+        console.warn("⚠️ Advertencia: El prototipo no tiene usuario o email asociado");
+      }
+
+      res.json(updatedPrototype);
+    });
+  })
+  .catch((error) => next(error));
+};
+
+module.exports.createComment = (req, res, next) => {
+  Prototype.findById(req.params.id)
+    .populate("user")
+    .then((prototype) => {
+      if (!prototype) {
+        return next(createError(404, "Prototype not found"));
+      }
+
+      return Comment.create({
+        text: req.body.text,
+        user: req.user.id,
+        prototype: req.params.id,
+      })
+      .then((comment) => {
+        if (prototype.user && prototype.user.email) {
+          mailer.sendNewCommentEmail(prototype.user.email, prototype, comment)
+            .catch(error => console.error("Error enviando email:", error));
+        }
+        res.status(201).json(comment);
+      });
+    })
+    .catch(next);
+};
 
 module.exports.detail = (req, res, next) => {
   const { id } = req.params;
@@ -133,30 +214,6 @@ module.exports.update = (req, res, next) => {
       else res.status(201).json(prototype);
     })
     .catch((error) => next(error));
-};
-
-module.exports.createComment = (req, res, next) => {
-  Prototype.findById(req.params.id)
-    .populate("user")
-    .then((prototype) => {
-      if (!prototype) {
-        return next(createError(404, "Prototype not found"));
-      }
-
-      return Comment.create({
-        text: req.body.text,
-        user: req.user.id,
-        prototype: req.params.id,
-      })
-      .then((comment) => {
-        if (prototype.user && prototype.user.email) {
-          mailer.sendNewCommentEmail(prototype.user.email, prototype, comment)
-            .catch(error => console.error("Error enviando email:", error));
-        }
-        res.status(201).json(comment);
-      });
-    })
-    .catch(next);
 };
 
 module.exports.detailComment = (req, res, next) => {
