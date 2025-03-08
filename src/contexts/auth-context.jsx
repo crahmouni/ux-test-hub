@@ -4,7 +4,7 @@ import { profile } from "../services/api-service";
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState();
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     profile()
@@ -26,12 +26,10 @@ export function AuthProvider({ children }) {
     logout,
   };
 
-  if (user === undefined) {
-    return null;
-  }
-
   return (
-    <AuthContext.Provider value={contextData}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={contextData}>
+      {user === undefined ? <p>Loading...</p> : children} {/* 🔹 Muestra un mensaje de carga temporal */}
+    </AuthContext.Provider>
   );
 }
 
