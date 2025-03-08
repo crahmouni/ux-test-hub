@@ -21,6 +21,6 @@ app.use(loadSessionUser);
 const routes = require("./config/routes.config");
 app.use("/api/v1/", routes);
 
-const port = Number(process.env.PORT || 5000);
 
-app.listen(port, () => console.info(`Application running at port ${port}`));
+
+module.exports = app;

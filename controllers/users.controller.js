@@ -2,41 +2,47 @@ const createError = require("http-errors");
 const User = require("../models/user.model");
 const { sendValidationEmail, sendWelcomeEmail } = require("../config/mailer.config");
 
-module.exports.create = (req, res, next) => {
-  const { email } = req.body;
+module.exports.create = async (req, res, next) => {
+  try {
+    const { email } = req.body;
 
-  User.findOne({ email })
-    .then((user) => {
-      if (user) {
-        next(
-          createError(400, {
-            message: "User email already taken",
-            errors: { email: "Already exists" },
-          })
-        );
-      } else {
-        return User.create({
-          email: req.body.email,
-          password: req.body.password,
-          name: req.body.name,
-          avatar: req.file?.path,
-        }).then((user) => {
-          // Enviar email de validación
-          sendValidationEmail(user)
-            .then(() => console.log(`Email de validación enviado a ${user.email}`))
-            .catch((error) => console.error("Error enviando email de validación:", error));
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return next(
+        createError(400, {
+          message: "User email already taken",
+          errors: { email: "Already exists" },
+        })
+      );
+    }
 
-          // Enviar email de bienvenida
-          sendWelcomeEmail(user.email, user.name)
-            .then(() => console.log(`Email de bienvenida enviado a ${user.email}`))
-            .catch((error) => console.error("Error enviando email de bienvenida:", error));
+    const user = await User.create({
+      email: req.body.email,
+      password: req.body.password,
+      name: req.body.name,
+      avatar: req.file?.path,
+    });
 
-          res.status(201).json(user);
-        });
-      }
-    })
-    .catch((error) => next(error));
+    try {
+      await sendValidationEmail(user);
+      console.log(`✅ Email de validación enviado a ${user.email}`);
+    } catch (error) {
+      console.error("❌ Error enviando email de validación:", error);
+    }
+
+    try {
+      await sendWelcomeEmail(user.email, user.name);
+      console.log(`✅ Email de bienvenida enviado a ${user.email}`);
+    } catch (error) {
+      console.error("❌ Error enviando email de bienvenida:", error);
+    }
+
+    res.status(201).json(user);
+  } catch (error) {
+    next(error);
+  }
 };
+
 
 module.exports.update = (req, res, next) => {
   const permittedBody = {

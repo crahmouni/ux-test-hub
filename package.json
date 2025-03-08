@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
+    "test": "jest --detectOpenHandles",
     "seeds": "node bin/seeds.js"
   },
   "author": "",
@@ -28,6 +29,15 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^9.5.0",
-    "nodemon": "^3.1.9"
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.9",
+    "supertest": "^7.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "restoreMocks": true,
+    "clearMocks": true,
+    "resetMocks": true,
+    "verbose": true
   }
 }
