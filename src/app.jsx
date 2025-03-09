@@ -6,9 +6,12 @@ import HomePage from "./pages/home";
 import SearchPage from "./pages/search";
 import PrototypeDetailPage from "./pages/prototype-detail";
 import LoginPage from "./pages/login";
-import RegisterPage from "./pages/register";
+import RegisterPage from "../src/pages/register";
 import CreatePrototypePage from "./pages/creat-prototype";
-import ConfirmEmailPage from "./pages/confirm-email";
+import ConfirmEmailPage from "../src/pages/confirm-email";
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap/dist/js/bootstrap.bundle.js';
+
 
 function App() {
   return (

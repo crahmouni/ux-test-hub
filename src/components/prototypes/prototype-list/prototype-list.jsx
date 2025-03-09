@@ -47,9 +47,11 @@ function PrototypeList({ city, max }) {
               <Card.Body>
                 <Card.Title>{prototype.title}</Card.Title>
                 <Card.Text>{prototype.description}</Card.Text>
-                <Link to={`/prototype/${prototype._id}`} className="btn btn-primary">
+                {prototype._id && /^[a-zA-Z0-9\-]+$/.test(prototype._id) && (
+                  <Link to={`/prototype/${encodeURIComponent(prototype._id)}`} className="btn btn-primary">
                   View Details
-                </Link>
+                  </Link>
+                )}
               </Card.Body>
             </Card>
           </Col>

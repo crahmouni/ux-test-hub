@@ -5,45 +5,66 @@ import { useNavigate } from "react-router-dom";
 import { Alert, Button } from "react-bootstrap";
 
 function RegisterForm() {
-  const { register, handleSubmit, formState: { errors }, setError } = useForm();
+  console.log("RegisterForm renderizado");
+
+  const { register, handleSubmit, formState: { errors }, setError, reset } = useForm();
   const navigate = useNavigate();
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleRegister = async (user) => {
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    console.log("📢 Evento de registro activado");
+    
     const formData = new FormData();
     formData.append("name", user.name);
     formData.append("email", user.email);
     formData.append("password", user.password);
-    formData.append("avatar", user.avatar[0]);
+    if (user.avatar) {  // Si se proporciona un avatar
+      formData.append("avatar", user.avatar);
+    }
+
+    console.log('Enviando datos al backend:', formData);
 
     try {
-      // Envía los datos de registro al backend
-      await UxTestHubAPI.register(formData);
-
-      // Muestra un mensaje de éxito
-      setSuccessMessage("Registration successful! Please check your email to confirm your account.");
-
-      // Redirige al usuario a una página de confirmación (opcional)
-      setTimeout(() => navigate("/confirm-email"), 3000); // Cambia "/confirm-email" por la ruta que desees
+      console.log("Enviando datos al backend..."); 
+      const response = await axios.post("http://localhost:5000/api/v1/users", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+  
+      console.log("Registro exitoso:", response.data);
+      setSuccessMessage("Registro exitoso. Revisa tu correo para confirmar tu cuenta.");
+      
+      reset(); // Limpia el formulario después del registro exitoso
+      
+      console.log("Redirigiendo a /confirm-email");
+      navigate("/confirm-email"); // Redirigir a una página de confirmación
+  
     } catch (error) {
-      // Maneja errores de validación o del servidor
+      console.error("Error durante el registro:", error); // Verifica si hay errores
+      
       if (error.response?.data?.errors) {
-        const { data } = error.response;
-        Object.keys(data.errors).forEach((inputName) =>
-          setError(inputName, { message: data.errors[inputName] })
-        );
+          const { data } = error.response;
+          console.log("Errores de validación:", data.errors); 
+          
+          // Muestra los errores en los campos del formulario
+          Object.keys(data.errors).forEach((inputName) =>
+            setError(inputName, { message: data.errors[inputName] })
+          );
       } else {
-        setErrorMessage("An error occurred during registration. Please try again.");
+          setErrorMessage("Ocurrió un error durante el registro. Por favor, intenta nuevamente.");
       }
-    }
+    }  
   };
 
   return (
     <div>
-      {successMessage && <Alert variant="success">{successMessage}</Alert>}
-      {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
-      <form onSubmit={handleSubmit(handleRegister)}>
+      {successMessage && <Alert variant="success" onClose={() => setSuccessMessage("")} dismissible>{successMessage}</Alert>}
+      {errorMessage && <Alert variant="danger" onClose={() => setErrorMessage("")} dismissible>{errorMessage}</Alert>}
+      <form onSubmit={handleSubmit((data) => {
+        console.log("Formulario enviado", data);
+        handleRegister(data);
+      })}>
         <div className="input-group mb-1">
           <span className="input-group-text"><i className="fa fa-user fa-fw"></i></span>
           <input

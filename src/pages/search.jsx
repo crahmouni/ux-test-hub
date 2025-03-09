@@ -1,7 +1,7 @@
 import { useLocation, useSearchParams } from "react-router-dom";
 import { PrototypeList } from "../components/prototypes";
 import { PageLayout } from "../components/layouts";
-import { GoogleAutocompleteInput } from "../components/google";
+import { Button } from "react-bootstrap";
 
 function SearchPage() {
   const location = useLocation();
@@ -18,14 +18,8 @@ function SearchPage() {
     setSearchParams({ city, max, page: newPage, lat, lng });
   }
 
-  function handlePlaceChange(location) {
-    const { lat, lng, city } = location;
-    setSearchParams({ city, max, page: 1, lat, lng });
-  }
-
   return (
     <PageLayout>
-      <GoogleAutocompleteInput className="mb-3" onPlaceChange={handlePlaceChange} />
       <h3 className="fw-light">What's on in {city}</h3>
       <PrototypeList city={city} max={max} page={page} lat={lat} lng={lng} />
       <div className="mt-3">

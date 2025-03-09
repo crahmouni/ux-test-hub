@@ -1,6 +1,7 @@
 import React from "react";
 import { Container, Alert } from "react-bootstrap";
 
+
 function ConfirmEmailPage() {
   return (
     <Container className="text-center mt-5">

@@ -1,22 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { getPrototype } from "../../../services/api-service";
 import { Container, Row, Col, Card, Spinner, Alert } from "react-bootstrap";
 
 function PrototypeDetail() {
   const { id } = useParams(); // Obtiene el ID del prototipo desde la URL
+  console.log("🔍 ID recibido de useParams():", id);
+  
   let decodedId = id;
-
-  try {
-    if (id && /%[0-9A-Fa-f]{2}/.test(id)) { // 🔹 Verifica si `id` tiene caracteres codificados válidos
-      decodedId = decodeURIComponent(id);
+  if (id && /%[0-9A-Fa-f]{2}/.test(id)) {
+    try {
+        decodedId = decodeURIComponent(id);
+        console.log("✅ ID después de decodeURIComponent:", decodedId);
+    } catch (error) {
+        console.error("❌ Error al decodificar ID:", id, error);
+        decodedId = id; // 🔹 Usa el ID original si la decodificación falla
     }
-  } catch (error) {
-    console.error("Error al decodificar ID:", id, error);
-    decodedId = null; // 🔹 Evita procesar un ID inválido
   }
 
-  console.log("ID después de decodeURIComponent:", decodedId);
+  console.log("✅ ID después de decodeURIComponent:", decodedId);
 
   const [prototype, setPrototype] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -24,7 +26,7 @@ function PrototypeDetail() {
 
   useEffect(() => {
     if (!decodedId) {
-      setError("Invalid prototype ID"); // 🔹 Muestra error si el ID no es válido
+      setError("Invalid prototype ID");
       setLoading(false);
       return;
     }
@@ -38,7 +40,7 @@ function PrototypeDetail() {
         setError(error.message || "Error fetching prototype details");
         setLoading(false);
       });
-  }, [decodedId]); // ✅ Ahora `useEffect` depende de `decodedId`
+  }, [decodedId]);
 
   if (loading) {
     return (
