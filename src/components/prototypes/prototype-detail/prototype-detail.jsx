@@ -53,6 +53,9 @@ function PrototypeDetail() {
     return (
       <Container className="mt-5">
         <Alert variant="danger">{error}</Alert>
+        <Link to="/prototypes" className="btn btn-primary mt-3">
+          Back to List
+        </Link>
       </Container>
     );
   }
@@ -62,14 +65,23 @@ function PrototypeDetail() {
       <Row className="justify-content-center">
         <Col md={8}>
           <Card>
-            <Card.Img variant="top" src={prototype.poster} alt={prototype.title} />
+            {prototype.poster && (
+              <Card.Img variant="top" src={prototype.poster} alt={prototype.title} />
+            )}
             <Card.Body>
               <Card.Title>{prototype.title}</Card.Title>
               <Card.Text>{prototype.description}</Card.Text>
-              <p><strong>Start Date:</strong> {new Date(prototype.startDate).toLocaleDateString()}</p>
-              <p><strong>End Date:</strong> {new Date(prototype.endDate).toLocaleDateString()}</p>
+              {prototype.startDate && (
+                <p><strong>Start Date:</strong> {new Date(prototype.startDate).toLocaleDateString()}</p>
+              )}
+              {prototype.endDate && (
+                <p><strong>End Date:</strong> {new Date(prototype.endDate).toLocaleDateString()}</p>
+              )}
               <p><strong>Status:</strong> {prototype.status}</p>
               <p><strong>Feedback:</strong> {prototype.feedback || "No feedback yet"}</p>
+              <Link to="/prototypes" className="btn btn-primary">
+                Back to List
+              </Link>
             </Card.Body>
           </Card>
         </Col>

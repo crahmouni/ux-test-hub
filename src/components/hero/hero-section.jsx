@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Button, Row, Col } from "react-bootstrap";
+import { Container, Row, Col, Button } from "react-bootstrap";
 
 function HeroSection() {
   return (
@@ -15,7 +15,11 @@ function HeroSection() {
             <Button variant="outline-dark">Learn More</Button>
           </Col>
           <Col lg={6} className="d-none d-lg-block">
-            <img src="https://placehold.co/600x400" alt="UX Testing" className="img-fluid rounded" />
+            <img
+              src="/images/ux-testing-demo.jpg" // Ruta a una imagen real
+              alt="UX Testing Platform Demo"
+              className="img-fluid rounded"
+            />
           </Col>
         </Row>
       </Container>

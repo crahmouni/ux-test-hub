@@ -9,30 +9,36 @@ function SearchPage() {
   const queryParams = new URLSearchParams(location.search);
   const city = queryParams.get('city');
   const max = queryParams.get('max');
-  const page = queryParams.get('page');
+  const page = queryParams.get('page') || 1;
   const lat = queryParams.get('lat');
   const lng = queryParams.get('lng');
 
-  function handlePageChange(page) {
-    page = Math.max(0, page);
-    setSearchParams({ city, max, page });
+  function handlePageChange(newPage) {
+    newPage = Math.max(1, newPage);
+    setSearchParams({ city, max, page: newPage, lat, lng });
   }
 
   function handlePlaceChange(location) {
     const { lat, lng, city } = location;
-    console.log(location);
-    setSearchParams({ city, max, page: 0, lat, lng });
+    setSearchParams({ city, max, page: 1, lat, lng });
   }
 
   return (
     <PageLayout>
       <GoogleAutocompleteInput className="mb-3" onPlaceChange={handlePlaceChange} />
       <h3 className="fw-light">What's on in {city}</h3>
-      <PrototypeList city={city} max={max} page={Math.max(page, 0)} lat={lat} lng={lng} />
-      <button className="btn btn-secondary me-1 btn-sm" onClick={() => handlePageChange(Number(page) - 1)}>Prev</button>
-      <button className="btn btn-primary btn-sm" onClick={() => handlePageChange(Number(page) + 1)}>Next</button>
+      <PrototypeList city={city} max={max} page={page} lat={lat} lng={lng} />
+      <div className="mt-3">
+        <Button variant="secondary" onClick={() => handlePageChange(Number(page) - 1)} disabled={page <= 1}>
+          Previous
+        </Button>
+        <span className="mx-3">Page {page}</span>
+        <Button variant="primary" onClick={() => handlePageChange(Number(page) + 1)}>
+          Next
+        </Button>
+      </div>
     </PageLayout>
-  )
+  );
 }
 
 export default SearchPage;

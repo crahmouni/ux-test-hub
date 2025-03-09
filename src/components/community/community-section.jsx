@@ -1,12 +1,15 @@
 import React from "react";
 import { Container, Row, Col, Button } from "react-bootstrap";
+import { Link } from "react-router-dom"; // Importa Link para la navegación
 
 function CommunitySection() {
   return (
     <section className="py-5 text-center">
       <Container>
         <h2 className="fw-bold">Join Our Growing Community</h2>
-        <p className="text-muted">Connect with UX professionals, share insights, and improve your designs.</p>
+        <p className="text-muted">
+          Connect with UX professionals, share insights, and improve your designs.
+        </p>
         <Row className="justify-content-center">
           <Col md={3}>
             <h3 className="text-primary fw-bold">15,482</h3>
@@ -21,7 +24,15 @@ function CommunitySection() {
             <p>Feedback Collected</p>
           </Col>
         </Row>
-        <Button variant="primary" className="mt-3">Join Now</Button>
+        {/* Botón "Join Now" con enlace real */}
+        <Button
+          as={Link} // Convierte el botón en un enlace
+          to="/register" // Ruta a la que redirige (puedes cambiarla según tu necesidad)
+          variant="primary"
+          className="mt-3"
+        >
+          Join Now
+        </Button>
       </Container>
     </section>
   );

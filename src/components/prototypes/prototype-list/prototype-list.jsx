@@ -3,13 +3,13 @@ import { getPrototypes } from "../../../services/api-service";
 import { Container, Row, Col, Card, Spinner, Alert } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
-function PrototypeList() {
+function PrototypeList({ city, max }) {
   const [prototypes, setPrototypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    getPrototypes(id)
+    getPrototypes()
       .then((data) => {
         setPrototypes(data);
         setLoading(false);
@@ -40,14 +40,14 @@ function PrototypeList() {
   return (
     <Container className="mt-5">
       <Row>
-        {prototypes.map((prototype) => (
+        {prototypes.slice(0, max).map((prototype) => (
           <Col md={4} key={prototype._id} className="mb-4">
             <Card>
               <Card.Img variant="top" src={prototype.poster} />
               <Card.Body>
                 <Card.Title>{prototype.title}</Card.Title>
                 <Card.Text>{prototype.description}</Card.Text>
-                <Link to={`/prototype/${encodeURIComponent(prototype._id)}`} className="btn btn-primary">
+                <Link to={`/prototype/${prototype._id}`} className="btn btn-primary">
                   View Details
                 </Link>
               </Card.Body>

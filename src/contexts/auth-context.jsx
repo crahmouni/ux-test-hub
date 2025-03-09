@@ -7,16 +7,24 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    profile()
-      .then((data) => setUser(data))
-      .catch(() => setUser(null));
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      profile()
+        .then((data) => setUser(data))
+        .catch(() => {
+          localStorage.removeItem("authToken");
+          setUser(null);
+        });
+    }
   }, []);
 
   function login(user) {
+    localStorage.setItem("authToken", user.token);
     setUser(user);
   }
 
   function logout() {
+    localStorage.removeItem("authToken");
     setUser(null);
   }
 
@@ -28,7 +36,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={contextData}>
-      {user === undefined ? <p>Loading...</p> : children} {/* 🔹 Muestra un mensaje de carga temporal */}
+      {children}
     </AuthContext.Provider>
   );
 }

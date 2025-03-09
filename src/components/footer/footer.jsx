@@ -1,5 +1,6 @@
 import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
+import { Link } from "react-router-dom"; // Importa Link para la navegación
 
 function Footer() {
   return (
@@ -13,17 +14,17 @@ function Footer() {
           <Col md={3}>
             <h6>Company</h6>
             <ul className="list-unstyled">
-              <li><a href="#" className="text-muted">About Us</a></li>
-              <li><a href="#" className="text-muted">Careers</a></li>
-              <li><a href="#" className="text-muted">Press</a></li>
+              <li><Link to="/about" className="text-muted">About Us</Link></li>
+              <li><Link to="/careers" className="text-muted">Careers</Link></li>
+              <li><Link to="/press" className="text-muted">Press</Link></li>
             </ul>
           </Col>
           <Col md={3}>
             <h6>Help</h6>
             <ul className="list-unstyled">
-              <li><a href="#" className="text-muted">Support</a></li>
-              <li><a href="#" className="text-muted">FAQ</a></li>
-              <li><a href="#" className="text-muted">Privacy Policy</a></li>
+              <li><Link to="/support" className="text-muted">Support</Link></li>
+              <li><Link to="/faq" className="text-muted">FAQ</Link></li>
+              <li><Link to="/privacy-policy" className="text-muted">Privacy Policy</Link></li>
             </ul>
           </Col>
           <Col md={3}>

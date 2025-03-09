@@ -1,31 +1,36 @@
+import { useState } from "react";
 import { useForm } from 'react-hook-form';
-import * as UxTestHubAPI from '../../../services/api-service'; 
+import * as UxTestHubAPI from '../../../services/api-service';
 import { useAuthContext } from '../../../contexts/auth-context';
 import { useNavigate } from 'react-router-dom';
+import { Alert, Button } from 'react-bootstrap';
+import { Link } from "react-router-dom";
 
 function LoginForm() {
   const { register, handleSubmit, formState: { errors }, setError } = useForm();
   const { login } = useAuthContext();
   const navigate = useNavigate();
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleLogin = async (user) => {
     try {
-      user = await UxTestHubAPI.login(user);
-      login(user);
-      navigate('/');
+      const data = await UxTestHubAPI.login(user);
+      login(data);
+      setSuccessMessage("Login successful! Redirecting...");
+      setTimeout(() => navigate('/'), 2000);
     } catch (error) {
       if (error.response?.status === 401) {
         const { data } = error.response;
-        Object.keys(data.errors)
-          .forEach((inputName) => setError(inputName, { message: data.errors[inputName] }));
+        Object.keys(data.errors).forEach((inputName) => setError(inputName, { message: data.errors[inputName] }));
       } else {
         console.error(error);
       }
     }
-  }
+  };
 
   return (
     <div>
+      {successMessage && <Alert variant="success">{successMessage}</Alert>}
       <form onSubmit={handleSubmit(handleLogin)}>
         <div className="input-group mb-1">
           <span className="input-group-text"><i className='fa fa-user fa-fw'></i></span>
@@ -42,6 +47,9 @@ function LoginForm() {
           <button className='btn btn-primary' type='submit'>Login</button>
         </div>
       </form>
+      <div className="mt-3 text-center">
+        <Link to="/forgot-password">Forgot Password?</Link>
+      </div>
     </div>
   );
 }

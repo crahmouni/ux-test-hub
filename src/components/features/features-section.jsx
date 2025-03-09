@@ -16,7 +16,7 @@ function FeaturesSection() {
         <Row>
           {features.map((feature, index) => (
             <Col md={4} key={index}>
-              <Card className="text-center p-4 shadow-sm">
+              <Card className="text-center p-4 shadow-sm feature-card">
                 <div className="display-4 text-primary mb-3">{feature.icon}</div>
                 <Card.Title>{feature.title}</Card.Title>
                 <Card.Text className="text-muted">{feature.text}</Card.Text>

@@ -17,7 +17,12 @@ function AnalyticsSection() {
             </div>
           </Col>
           <Col lg={6} className="d-none d-lg-block">
-            <img src="https://placehold.co/600x400" alt="Analytics" className="img-fluid rounded" />
+            <img
+              src="https://placehold.co/600x400"
+              alt="Analytics"
+              className="img-fluid rounded"
+              aria-label="Illustration of analytics dashboard showing user behavior insights"
+            />
           </Col>
         </Row>
       </Container>

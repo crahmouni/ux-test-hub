@@ -28,6 +28,8 @@ export default [
         'warn',
         { allowConstantExport: true },
       ],
+      'no-duplicate-imports': 'error', // Evita importaciones duplicadas
+      'react/prop-types': 'warn', // Asegura que los componentes estén correctamente tipados
     },
   },
 ]

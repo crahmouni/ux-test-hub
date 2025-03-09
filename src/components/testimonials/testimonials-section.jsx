@@ -12,7 +12,7 @@ function TestimonialsSection() {
     <section className="py-5">
       <Container>
         <h2 className="text-center fw-bold mb-4">What Our Users Say</h2>
-        <Carousel>
+        <Carousel prevLabel="Previous" nextLabel="Next" indicators>
           {testimonials.map((testimonial, index) => (
             <Carousel.Item key={index} className="text-center">
               <p className="lead">"{testimonial.text}"</p>

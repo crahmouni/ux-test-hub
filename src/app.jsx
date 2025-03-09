@@ -8,14 +8,7 @@ import PrototypeDetailPage from "./pages/prototype-detail";
 import LoginPage from "./pages/login";
 import RegisterPage from "./pages/register";
 import CreatePrototypePage from "./pages/creat-prototype";
-import { PrivateRoute } from "./guards";
-
-// Secciones de la Home Page
-import HeroSection from "./components/hero/hero-section";
-import FeaturesSection from "./components/features/features-section";
-import AnalyticsSection from "./components/analytics/analytics-section";
-import TestimonialsSection from "./components/testimonials/testimonials-section";
-import CommunitySection from "./components/community/community-section";
+import ConfirmEmailPage from "./pages/confirm-email";
 
 function App() {
   return (
@@ -23,37 +16,17 @@ function App() {
       <Navbar />
 
       <Routes>
-        {/* Rutas de la aplicación */}
-        <Route
-          path="/"
-          element={
-            <PrivateRoute>
-              <HomePage />
-            </PrivateRoute>
-          }
-        />
+        {/* Ruta principal */}
+        <Route path="/" element={<HomePage />} />
+
+        {/* Otras rutas */}
         <Route path="/prototypes/:id" element={<PrototypeDetailPage />} />
-        <Route
-          path="/create-prototype"
-          element={
-            <PrivateRoute role="admin">
-              <CreatePrototypePage />
-            </PrivateRoute>
-          }
-        />
+        <Route path="/create-prototype" element={<CreatePrototypePage />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/confirm-email" element={<ConfirmEmailPage />} /> {/* Ruta de confirmación */}
       </Routes>
-
-      {/* Secciones de la Home Page */}
-      <main className="pt-[72px]">
-        <HeroSection />
-        <FeaturesSection />
-        <AnalyticsSection />
-        <TestimonialsSection />
-        <CommunitySection />
-      </main>
 
       <Footer />
     </div>
