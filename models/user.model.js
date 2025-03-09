@@ -48,15 +48,9 @@ const userSchema = new mongoose.Schema(
     },
     avatar: {
       type: String,
-      default: function () {
-        return `https://i.pravatar.cc/350?u=${this.email}`;
-      },
-      validate: {
-        validator: isURL,
-        message: function () {
-          return "Invalid avatar URL";
-        },
-      },
+    // Eliminamos la validación de URL para permitir que avatar sea nulo o vacío
+      required: false, // Esto hace que avatar no sea obligatorio
+      default: null, 
     },
     role: {
       type: String,
@@ -103,5 +97,4 @@ userSchema.methods.checkPassword = function (passwordToCheck) {
   return bcrypt.compare(passwordToCheck, this.password);
 };
 
-const User = mongoose.model("User", userSchema);
-module.exports = User;
+module.exports = mongoose.model('User', userSchema);

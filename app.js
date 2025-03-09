@@ -8,6 +8,8 @@ const { cors } = require("./config/cors.config");
 /* DB init */
 require("./config/db.config");
 
+
+
 const app = express();
 
 /* Middlewares */
@@ -23,4 +25,8 @@ app.use("/api/v1/", routes);
 
 const port = Number(process.env.PORT || 5000);
 
-app.listen(port, () => console.info(`Application running at port ${port}`));
+
+app.listen(port, () => {
+    console.log(`✅ Server is running at http://localhost:${port}`);
+  });
+

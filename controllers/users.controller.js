@@ -3,7 +3,12 @@ const User = require("../models/user.model");
 const { sendValidationEmail, sendWelcomeEmail } = require("../config/mailer.config");
 
 module.exports.create = (req, res, next) => {
-  const { email } = req.body;
+  console.log("📩 Solicitud recibida en el backend", req.body);
+  const { email, password, name } = req.body;
+
+  if (!email || !password || !name) {
+    return next(createError(400, "Todos los campos son obligatorios"));
+  }
 
   User.findOne({ email })
     .then((user) => {
@@ -19,8 +24,9 @@ module.exports.create = (req, res, next) => {
           email: req.body.email,
           password: req.body.password,
           name: req.body.name,
-          avatar: req.file?.path,
+          avatar: req.file ? req.file.path : null,
         }).then((user) => {
+          console.log("Usuario creado:", user);
           // Enviar email de validación
           sendValidationEmail(user)
             .then(() => console.log(`Email de validación enviado a ${user.email}`))
@@ -35,7 +41,10 @@ module.exports.create = (req, res, next) => {
         });
       }
     })
-    .catch((error) => next(error));
+    .catch((err) => {
+      console.error("Error al crear usuario:", err);  // Verifica cualquier error al crear el usuario
+      next(err);
+    });
 };
 
 module.exports.update = (req, res, next) => {
@@ -43,7 +52,7 @@ module.exports.update = (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
     name: req.body.name,
-    avatar: req.body.avatar,
+    avatar: req.file ? req.file.path : req.body.avatar, 
   };
 
   // remove undefined keys
@@ -77,4 +86,16 @@ module.exports.validate = (req, res, next) => {
 
 module.exports.profile = (req, res, next) => {
   res.json(req.user);
+};
+
+module.exports.list = (req, res, next) => {
+  // Consultar todos los usuarios en la base de datos
+  User.find()
+    .then((users) => {
+      res.json(users);  // Devolver la lista de usuarios
+    })
+    .catch((err) => {
+      console.error("Error al obtener usuarios:", err);
+      next(err);  // Pasar el error al middleware de manejo de errores
+    });
 };
